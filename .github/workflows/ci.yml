@@ -22,7 +22,7 @@ jobs:
         uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
         with:
           context: ./frontend           # Build context should be the frontend directory
-          dockerfile: ./Dockerfile      # Dockerfile path relative to the build context
+          file: ./Dockerfile            # Dockerfile path relative to the build context
           push: true # Push the built image to the registry
           tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-main:latest # Use the DockerHub username and image name for the tag
           
