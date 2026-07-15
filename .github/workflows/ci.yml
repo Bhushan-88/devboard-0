@@ -3,7 +3,7 @@ name: CI
 
 on:
   push:
-    branches: [master] #when a change is made to the main branch, trigger the workflow
+    branches: [main] #when a change is made to the main branch, trigger the workflow
 
 jobs:
   build-and-push:
