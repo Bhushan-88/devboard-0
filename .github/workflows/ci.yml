@@ -6,7 +6,30 @@ on:
     branches: [main] #when a change is made to the main branch, trigger the workflow
 
 jobs:
+  code-lint:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3 # Set up Node.js environment
+        with:
+          node-version: '20' # Specify the Node.js version to use
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps # Install project dependencies using npm ci with legacy peer dependencies
+
+      - name: Run ESLint
+        run: npm run lint # Run the frontend lint script
+
   build-and-push:
+    needs: [code-lint] # Ensure that the code-lint job is completed before running this job
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
     steps:
       - name: Checkout code # Checkout the repository code
@@ -17,12 +40,12 @@ jobs:
         with:
           username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
           password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
-          
+
       - name: Build and Push Docker Image # Build and push the Docker image to DockerHub
         uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
         with:
           context: ./frontend           # Path to your Dockerfile directory
-          dockerfile: ./frontend/Dockerfile  # Full path to Dockerfile
+          file: ./Dockerfile            # Dockerfile path relative to the build context
           push: true # Push the built image to the registry
           tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-main:latest # Use the DockerHub username and image name for the tag
           
