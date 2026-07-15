@@ -18,3 +18,8 @@ jobs:
           username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
           password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
           
+      - name: Build and Push Docker Image # Build and push the Docker image to DockerHub
+        uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
+        with:
+          push: true # Push the built image to the registry
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-main:latest # Use the DockerHub username and image name for the tag
