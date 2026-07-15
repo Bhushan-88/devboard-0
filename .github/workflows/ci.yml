@@ -1,0 +1,20 @@
+# Goal: Build the image for DevBoard frontend and push it to DockerHub whenever a change is made to the code in the main branch.
+name: CI
+
+on:
+  push:
+    branches: [master] #when a change is made to the main branch, trigger the workflow
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    steps:
+      - name: Checkout code # Checkout the repository code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Docker Login # Log in to DockerHub
+        uses: docker/login-action@v4 # Log in to DockerHub using the provided username and password
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
+          
