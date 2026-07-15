@@ -44,8 +44,8 @@ jobs:
       - name: Build and Push Docker Image # Build and push the Docker image to DockerHub
         uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
         with:
-          context: ./frontend           # Path to your Dockerfile directory
-          file: ./Dockerfile            # Dockerfile path relative to the build context
+          context: ./frontend           # Build from the frontend directory
+          file: ./frontend/Dockerfile   # Dockerfile path from the repository root
           push: true # Push the built image to the registry
           tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-main:latest # Use the DockerHub username and image name for the tag
           
