@@ -8,7 +8,7 @@ on:
     branches: [advanced] # Trigger the workflow on changes to the advanced branch  
 
 jobs:
-  code-lint:
+  frontend-lint:
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
     defaults:
       run:
@@ -33,8 +33,8 @@ jobs:
       - name: Run Tests # Run frontend tests
         run: npm test # Execute the frontend test script
 
-  build-and-push:
-    needs: [code-lint]
+  Frontend-build-and-push:
+    needs: [frontend-lint]
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
     steps:
       - name: Checkout code # Checkout the repository code
@@ -54,4 +54,52 @@ jobs:
           push: true # Push the built image to the registry
           tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-advanced:latest # Use the DockerHub username and image name for the tag
 
-      
+  Backend-lint:
+    # Github Actions job to lint the backend code
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    defaults:
+      run:
+        working-directory: backend # Set the working directory to the backend folder
+    steps:
+      - name: Checkout code # Checkout the repository code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Set up Go # Set up Go environment
+        uses: actions/setup-go@v6 # Use the Go setup action
+        with:
+           go-version: '1.23' # Specify the Go version to use
+           go-version-file: backend/go.mod # Specify the path to the go.mod file for version management
+           cache-dependency-path: backend/go.sum # Specify the path to the go.sum file for caching dependencies
+
+      - name: Run GO Format # Run gofmt to check for code formatting issues
+        run: go fmt ./... # Format all Go files
+
+      - name: Run GO Vet # Run go vet to check for code issues
+        run: go vet ./... # Vet all Go files
+
+      - name: Run GO Test # Run Go tests
+        run: go test ./... # Execute all Go tests
+
+      - name: Run GO Lint # Run golangci-lint to check for code issues
+        run: golangci-lint run ./... # Run golangci-lint on all Go files
+
+  Backend-build-and-push:
+      needs: [Backend-lint] # This job depends on the successful completion of the Backend-lint job
+      runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+      steps:
+        - name: Checkout code # Checkout the repository code
+          uses: actions/checkout@v7 # Checkout the repository code
+
+        - name: Docker Login # Log in to DockerHub
+          uses: docker/login-action@v4 # Log in to DockerHub using the provided username and password
+          with:
+            username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
+            password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
+
+        - name: Build and Push Backend Docker Image # Build and push the backend Docker image to DockerHub
+          uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
+          with:
+            context: ./backend           # Build from the backend directory
+            file: ./backend/Dockerfile   # Dockerfile path from the repository root
+            push: true # Push the built image to the registry
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-be-advanced:latest # Use the DockerHub username and image name for the tag
