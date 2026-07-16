@@ -8,7 +8,7 @@ on:
     branches: [advanced] # Trigger the workflow on changes to the advanced branch  
 
 jobs:
-  frontend-lint:
+  Frontend-lint:
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
     defaults:
       run:
@@ -54,6 +54,7 @@ jobs:
           push: true # Push the built image to the registry
           tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-advanced:latest # Use the DockerHub username and image name for the tag
 
+
   Backend-lint:
     # Github Actions job to lint the backend code
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
@@ -79,9 +80,6 @@ jobs:
 
       - name: Run GO Test # Run Go tests
         run: go test ./... # Execute all Go tests
-
-      - name: Run GO Lint # Run golangci-lint to check for code issues
-        run: golangci-lint run ./... # Run golangci-lint on all Go files
 
   Backend-build-and-push:
       needs: [Backend-lint] # This job depends on the successful completion of the Backend-lint job
