@@ -34,7 +34,7 @@ jobs:
         run: npm test # Execute the frontend test script
 
   Frontend-build-and-push:
-    needs: [frontend-lint]
+    needs: [Frontend-lint]
     runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
     steps:
       - name: Checkout code # Checkout the repository code

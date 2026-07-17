@@ -1,68 +1,66 @@
-# GitHub Action CI/CD
+# GitHub Actions CI Pipeline
 
-This document describes a basic GitHub Actions CI/CD workflow for building, testing, and deploying a repository.
+This document describes the CI pipeline for the DevBoard project using GitHub Actions.
 
 ## Overview
+The workflow runs automatically on every push to the advanced branch and performs the following tasks:
 
-- GitHub Actions runs workflows defined in `.github/workflows/*.yml`.
-- A workflow can use jobs, steps, and actions to build, test, and deploy code automatically.
-- Common triggers: `push`, `pull_request`, `schedule`, `workflow_dispatch`.
+- Frontend linting and testing
+- Frontend Docker image build and push to Docker Hub
+- Backend linting, formatting, and testing
+- Backend Docker image build and push to Docker Hub
 
-## Example Workflow
+## Trigger
+The workflow is triggered on:
 
-```yaml
-name: CI Pipeline
+- Push to the advanced branch
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
-  workflow_dispatch:
+## Jobs
 
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+### 1. Frontend-lint
+This job checks the frontend code by:
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '18'
+- Checking out the repository
+- Setting up Node.js 20
+- Installing dependencies with npm ci --legacy-peer-deps
+- Running ESLint
+- Running frontend tests
 
-      - name: Install dependencies
-        run: npm install
+### 2. Frontend-build-and-push
+This job runs after the frontend lint job succeeds and:
 
-      - name: Run tests
-        run: npm test
+- Logs in to Docker Hub
+- Builds the frontend Docker image
+- Pushes the image to Docker Hub using the tag:
+  - username/devboard-fe-advanced:latest
 
-```
+### 3. Backend-lint
+This job validates the backend code by:
 
-## Key concepts
+- Checking out the repository
+- Setting up Go 1.23
+- Running gofmt
+- Running go vet
+- Running Go tests
 
-- `jobs`: separate units of work that run in parallel by default.
-- `runs-on`: the runner environment, such as `ubuntu-latest`.
-- `steps`: individual commands or actions executed in a job.
-- `uses`: an action from the marketplace or repository.
-- `run`: shell commands executed on the runner.
-- `needs`: defines job dependencies.
-- `if`: conditional execution.
+### 4. Backend-build-and-push
+This job runs after the backend lint job succeeds and:
 
-## Best practices
+- Logs in to Docker Hub
+- Builds the backend Docker image
+- Pushes the image to Docker Hub using the tag:
+  - username/devboard-be-advanced:latest
 
-- Keep workflows focused and readable.
-- Cache dependencies when possible.
-- Use secrets for credentials (`secrets.MY_SECRET`).
-- Require pull request checks before merging.
+## Required GitHub Configuration
+To make the workflow work, configure the following in GitHub repository settings:
 
-## Workflow file location
+- Secret: DOCKERHUB_TOKEN
+- Variable: DOCKERHUB_USERNAME
 
-Place workflow files in:
+## Workflow File
+The workflow is defined in:
 
-```
-.github/workflows/<workflow-name>.yml
-```
+- .github/workflows/CI-pipeline.yml
+
+## Summary
+This pipeline helps ensure code quality and automatically publishes updated frontend and backend images whenever changes are pushed to the advanced branch.
