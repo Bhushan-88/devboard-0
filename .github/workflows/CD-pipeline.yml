@@ -21,12 +21,11 @@ jobs:
             
             - name: Docker Login # Log in to DockerHub
               uses: docker/login-action@v4 # Log in to DockerHub using the provided username
-                with:
+              with:
                     username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
                     password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
             
             - name: Deploy the container # Deploy the Docker container using docker-compose
-                run: |
+              run: |
                     docker compose pull # Pull the latest images defined in the docker-compose.yml file
                     docker compose up -d # Start the containers in detached mode
-                    
