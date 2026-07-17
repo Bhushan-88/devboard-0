@@ -101,3 +101,8 @@ jobs:
             file: ./backend/Dockerfile   # Dockerfile path from the repository root
             push: true # Push the built image to the registry
             tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-be-advanced:latest # Use the DockerHub username and image name for the tag
+  
+  deploy:
+    needs: [Frontend-build-and-push, Backend-build-and-push] # This job depends on the successful completion of the Frontend-build-and-push and Backend-build-and-push jobs
+    uses: ./.github/workflows/CD-pipeline.yml # Use the CD-pipeline workflow defined in the .github/workflows/CD-pipeline.yml file
+    secrets: inherit # Inherit secrets from the parent workflow
