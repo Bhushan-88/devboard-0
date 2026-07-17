@@ -64,3 +64,72 @@ The workflow is defined in:
 
 ## Summary
 This pipeline helps ensure code quality and automatically publishes updated frontend and backend images whenever changes are pushed to the advanced branch.
+
+```bash
+# GitHub Actions CD Pipeline
+Use EC2 instance as a Self hosted Runner
+Ceate AWS EC2 Instance
+
+## Runner set up
+Goto github action on Github Repository Advanced =>Setting ->Actions ->Runners ->New self hosted runner-> select Linux
+
+mkdir actions-runner && cd actions-runner
+
+curl -o actions-runner-linux-x64-2.335.1.tar.gz -L https://github.com/actions/runner/releases/download/v2.335.1/actions-runner-linux-x64-2.335.1.tar.gz
+
+echo "4ef2f25285f0ae4477f1fe1e346db76d2f3ebf03824e2ddd1973a2819bf6c8cf  actions-runner-linux-x64-2.335.1.tar.gz" | shasum -a 256 -c
+
+tar xzf ./actions-runner-linux-x64-2.335.1.tar.gz
+
+ubuntu@ip-172-31-73-104:~/actions-runner$ ./config.sh --url https://github.com/Bhushan-88/devboard-0 --token A6FFDMO3E3SUFKDXZI5IIF3KLIDRK 
+
+--------------------------------------------------------------------------------
+|        ____ _ _   _   _       _          _        _   _                      |
+|       / ___(_) |_| | | |_   _| |__      / \   ___| |_(_) ___  _ __  ___      |
+|      | |  _| | __| |_| | | | | '_ \    / _ \ / __| __| |/ _ \| '_ \/ __|     |
+|      | |_| | | |_|  _  | |_| | |_) |  / ___ \ (__| |_| | (_) | | | \__ \     |
+|       \____|_|\__|_| |_|\__,_|_.__/  /_/   \_\___|\__|_|\___/|_| |_|___/     |
+|                                                                              |
+|                       Self-hosted runner registration                        |
+|                                                                              |
+--------------------------------------------------------------------------------
+
+# Authentication
+
+
+√ Connected to GitHub
+
+# Runner Registration
+
+Enter the name of the runner group to add this runner to: [press Enter for Default]
+
+Enter the name of runner: [press Enter for ip-172-31-73-104] self-hosted
+
+This runner will have the following labels: 'self-hosted', 'Linux', 'X64'
+Enter any additional labels (ex. label-1,label-2): [press Enter to skip]
+
+√ Runner successfully added
+
+# Runner settings
+
+Enter name of work folder: [press Enter for _work] devboard-0-work
+
+√ Settings Saved.
+
+ubuntu@ip-172-31-73-104:~/actions-runner$ ./run.sh
+
+√ Connected to GitHub
+
+Current runner version: '2.335.1'
+2026-07-17 09:48:40Z: Listening for Jobs
+
+## Now check runner on github status will idel
+
+# install docker and docker compose on self-hosted runner 
+sudo apt-get update && sudo apt-get install docker.io docker-compose-v2 -y 
+
+sudo usermod -aG docker $USER
+newgrp docker
+
+
+```
