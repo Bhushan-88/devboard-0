@@ -2,17 +2,19 @@
 
 
 name: CD-pipeline
+
 on:
   workflow_run:
-    workflows: ["CI-pipeline"] # Trigger the workflow when the CI-pipeline workflow is completed
+    workflows: ["CI-pipeline"] # Trigger this workflow after CI-pipeline completes
     types:
-      - completed # Trigger the workflow when the CI-pipeline workflow is completed
-    branches: [advanced] # Trigger the workflow on changes to the advanced branch
+      - completed
+    branches: [advanced] # Run this workflow only for the 'advanced' branch
 
 jobs:
-    deploy:
-        runs-on: self-hosted # Use a self-hosted runner for deployment
-        steps:
+  deploy:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    runs-on: self-hosted # Use a self-hosted runner for deployment
+    steps:
             - name: Checkout code # Checkout the repository code
               uses: actions/checkout@v7 # Checkout the repository code
             
