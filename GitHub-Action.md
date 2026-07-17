@@ -65,8 +65,54 @@ The workflow is defined in:
 ## Summary
 This pipeline helps ensure code quality and automatically publishes updated frontend and backend images whenever changes are pushed to the advanced branch.
 
-```bash
+
 # GitHub Actions CD Pipeline
+
+This document describes the CD pipeline for the DevBoard project using GitHub Actions.
+
+## Overview
+The workflow runs automatically after the CI pipeline completes successfully on the advanced branch and performs the following tasks:
+
+- Checkout the repository code
+- Copy the environment file for deployment
+- Log in to Docker Hub
+- Pull the latest Docker images
+- Start the containers using Docker Compose
+
+## Trigger
+The workflow is triggered on:
+
+- Completion of the CI-pipeline workflow
+- Push or merge on the advanced branch
+
+## Job
+
+### 1. Deploy
+This job runs on a self-hosted runner and:
+
+- Checks out the repository
+- Copies .env.example to .env
+- Logs in to Docker Hub using GitHub secrets and variables
+- Pulls the latest images from Docker Compose
+- Starts the containers in detached mode
+
+## Required GitHub Configuration
+To make the workflow work, configure the following in GitHub repository settings:
+
+- Secret: DOCKERHUB_TOKEN
+- Variable: DOCKERHUB_USERNAME
+
+## Workflow File
+The workflow is defined in:
+
+- .github/workflows/CD-pipeline.yml
+
+## Self-Hosted Runner Setup
+Use an EC2 instance as a self-hosted GitHub Actions runner.
+
+### Runner setup steps
+
+```bash
 Use EC2 instance as a Self hosted Runner
 Ceate AWS EC2 Instance
 
@@ -80,6 +126,7 @@ curl -o actions-runner-linux-x64-2.335.1.tar.gz -L https://github.com/actions/ru
 echo "4ef2f25285f0ae4477f1fe1e346db76d2f3ebf03824e2ddd1973a2819bf6c8cf  actions-runner-linux-x64-2.335.1.tar.gz" | shasum -a 256 -c
 
 tar xzf ./actions-runner-linux-x64-2.335.1.tar.gz
+
 
 ubuntu@ip-172-31-73-104:~/actions-runner$ ./config.sh --url https://github.com/Bhushan-88/devboard-0 --token A6FFDMO3E3SUFKDXZI5IIF3KLIDRK 
 
@@ -125,11 +172,17 @@ Current runner version: '2.335.1'
 
 ## Now check runner on github status will idel
 
+```
+
+### Install Docker on the runner
+```bash
 # install docker and docker compose on self-hosted runner 
 sudo apt-get update && sudo apt-get install docker.io docker-compose-v2 -y 
 
 sudo usermod -aG docker $USER
 newgrp docker
 
-
 ```
+
+## Summary
+This CD pipeline deploys the latest application containers automatically after a successful CI run on the advanced branch.
