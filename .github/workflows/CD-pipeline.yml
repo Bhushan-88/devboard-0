@@ -1,0 +1,28 @@
+# Goal: To deploy the built images from CI-pipeline.yml once the build is succeeded .
+
+
+name: CD-pipeline
+
+on:
+  workflow_call: # Allows this workflow to be called by other workflows
+
+jobs:
+   deploy:
+    runs-on: self-hosted # Use a self-hosted runner for deployment
+    steps:
+            - name: Checkout code # Checkout the repository code
+              uses: actions/checkout@v7 # Checkout the repository code
+            
+            - name: Copy Example .env file to .env # Copy the example environment file to the actual environment file
+              run: cp .env.example .env # Copy the example environment file to the actual environment file
+            
+            - name: Docker Login # Log in to DockerHub
+              uses: docker/login-action@v4 # Log in to DockerHub using the provided username
+              with:
+                    username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
+                    password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
+            
+            - name: Deploy the container # Deploy the Docker container using docker-compose
+              run: |
+                    docker compose pull # Pull the latest images defined in the docker-compose.yml file
+                    docker compose up -d # Start the containers in detached mode

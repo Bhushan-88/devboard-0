@@ -1,0 +1,113 @@
+# Goal: I have to Lint, Build, Test the code for Frontend & Backend, whenever a change is made to the code in the advanced branch.
+# Goal: Build and push DevBoard frontend & Backend image to DockerHub on advanced branch changes
+
+name: CI-pipeline
+
+on:
+  push:
+    paths:
+      - 'frontend/**' # Trigger the workflow on changes to the frontend directory
+      - 'backend/**'  # Trigger the workflow on changes to the backend directory
+    branches: [advanced] # Trigger the workflow on changes to the advanced branch  
+
+jobs:
+  Frontend-lint:
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3 # Set up Node.js environment
+        with:
+          node-version: '20' # Specify the Node.js version to use
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps # Install project dependencies using npm ci with legacy peer dependencies
+
+      - name: Run ESLint # Run ESLint to check for code style issues
+        run: npm run lint # Run the frontend lint script
+      
+      - name: Run Tests # Run frontend tests
+        run: npm test # Execute the frontend test script
+
+  Frontend-build-and-push:
+    needs: [Frontend-lint]
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    steps:
+      - name: Checkout code # Checkout the repository code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Docker Login # Log in to DockerHub
+        uses: docker/login-action@v4 # Log in to DockerHub using the provided username and password
+        with:
+          username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
+          password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
+
+      - name: Build and Push Frontend Docker Image # Build and push the frontend Docker image to DockerHub
+        uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
+        with:
+          context: ./frontend           # Build from the frontend directory
+          file: ./frontend/Dockerfile   # Dockerfile path from the repository root
+          push: true # Push the built image to the registry
+          tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-fe-advanced:latest # Use the DockerHub username and image name for the tag
+
+
+  Backend-lint:
+    # Github Actions job to lint the backend code
+    runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+    defaults:
+      run:
+        working-directory: backend # Set the working directory to the backend folder
+    steps:
+      - name: Checkout code # Checkout the repository code
+        uses: actions/checkout@v7 # Checkout the repository code
+
+      - name: Set up Go # Set up Go environment
+        uses: actions/setup-go@v6 # Use the Go setup action
+        with:
+           go-version: '1.23' # Specify the Go version to use
+           go-version-file: backend/go.mod # Specify the path to the go.mod file for version management
+           cache-dependency-path: backend/go.sum # Specify the path to the go.sum file for caching dependencies
+
+      - name: Run GO Format # Run gofmt to check for code formatting issues
+        run: go fmt ./... # Format all Go files
+
+      - name: Run GO Vet # Run go vet to check for code issues
+        run: go vet ./... # Vet all Go files
+
+      - name: Run GO Test # Run Go tests
+        run: go test ./... # Execute all Go tests
+
+  Backend-build-and-push:
+      needs: [Backend-lint] # This job depends on the successful completion of the Backend-lint job
+      runs-on: ubuntu-latest # Use the latest version of Ubuntu as the runner environment
+      steps:
+        - name: Checkout code # Checkout the repository code
+          uses: actions/checkout@v7 # Checkout the repository code
+
+        - name: Docker Login # Log in to DockerHub
+          uses: docker/login-action@v4 # Log in to DockerHub using the provided username and password
+          with:
+            username: ${{ vars.DOCKERHUB_USERNAME }} # Use the DockerHub username stored in GitHub variables for authentication
+            password: ${{ secrets.DOCKERHUB_TOKEN }} # Use the DockerHub token stored in GitHub secrets for authentication
+
+        - name: Build and Push Backend Docker Image # Build and push the backend Docker image to DockerHub
+          uses: docker/build-push-action@v7 # Use the Docker Build and Push Action
+          with:
+            context: ./backend           # Build from the backend directory
+            file: ./backend/Dockerfile   # Dockerfile path from the repository root
+            push: true # Push the built image to the registry
+            tags: ${{ vars.DOCKERHUB_USERNAME }}/devboard-be-advanced:latest # Use the DockerHub username and image name for the tag
+  
+  deploy:
+    needs: [Frontend-build-and-push, Backend-build-and-push] # This job depends on the successful completion of the Frontend-build-and-push and Backend-build-and-push jobs
+    uses: ./.github/workflows/CD-pipeline.yml # Use the CD-pipeline workflow defined in the .github/workflows/CD-pipeline.yml file
+    secrets: inherit # Inherit secrets from the parent workflow
+
+    
