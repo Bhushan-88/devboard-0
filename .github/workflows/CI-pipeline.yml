@@ -5,6 +5,9 @@ name: CI-pipeline
 
 on:
   push:
+    paths:
+      - 'frontend/**' # Trigger the workflow on changes to the frontend directory
+      - 'backend/**'  # Trigger the workflow on changes to the backend directory
     branches: [advanced] # Trigger the workflow on changes to the advanced branch  
 
 jobs:
