@@ -7,7 +7,7 @@ on:
   push:
     paths:
       - '**'
-      - '!.github/workflows/CI-pipeline.yml' # Exclude the CI pipeline workflow file itself
+      - '!.github/workflows/**' # Exclude workflow files from triggering the workflow 
     branches: [advanced] # Trigger the workflow on changes to the advanced branch  
 
 jobs:
