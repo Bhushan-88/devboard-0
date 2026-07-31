@@ -1,4 +1,4 @@
-FROM node:24 # Use the official Node.js 24 image as the base image 
+FROM node:26 # Use the official Node.js 26 image as the base image 
 
 WORKDIR /app # Set the working directory inside the container to /app
 
