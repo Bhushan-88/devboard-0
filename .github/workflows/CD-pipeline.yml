@@ -26,3 +26,4 @@ jobs:
               run: |
                     docker compose pull # Pull the latest images defined in the docker-compose.yml file
                     docker compose up -d # Start the containers in detached mode
+
