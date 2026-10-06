@@ -2,7 +2,7 @@ name: Go Linter
 
 on: 
     schedule:
-      - cron: '33 5 * * *' # Schedule the workflow to run at 5:33 AM every day
+      - cron: '6 11 * * *' # Schedule the workflow to run at 5:33 AM every day
         
 jobs:
     code-format:
