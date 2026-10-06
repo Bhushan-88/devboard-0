@@ -1,7 +1,8 @@
 name: Go Linter
 
 on: 
-    workflow_dispatch:
+    schedule:
+      - cron: '8 11 * * *' # Schedule the workflow to run at 11:08 AM every day
         
 jobs:
     code-format:
