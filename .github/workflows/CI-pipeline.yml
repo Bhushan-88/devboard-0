@@ -5,7 +5,9 @@ name: CI-pipeline
 
 on:
   push:
-    # paths:
+    paths:
+      - 'frontend/**' # Trigger the workflow on changes to any files in the frontend directory
+      - 'backend/**' # Trigger the workflow on changes to any files in the backend directory
     #   - '**'
     #   - '!.github/workflows/**' # Trigger the workflow on changes to any files except those in the .github/workflows directory
     branches: [feat/matrix-docker-build] # Trigger the workflow on changes to the advanced branch  
