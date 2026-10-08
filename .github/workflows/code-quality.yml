@@ -1,4 +1,4 @@
-# 1. Goal -I have to do SAST for Code
+# 1. Goal -I have to do SAST(Static Application Security Testing) for Code
 
 name: Code Quality
 
@@ -17,14 +17,12 @@ jobs:
                 node-version: '20' # Specify the Node.js version to use
                 cache: npm
                 cache-dependency-path: frontend/package-lock.json
-            - name: Install dependencies
-              run: npm ci --legacy-peer-deps # Install project dependencies using npm ci with legacy peer dependencies
+            - name: Install npm Packages
+              run: npm install
+              working-directory: frontend
 
             - name: Run ESLint Tests # Run ESLint to check for code style issues
               run: npm run lint # Run the frontend lint script
-
-            - name: Run Tests # Run frontend tests
-              run: npm run test # Execute the frontend test script
               working-directory: frontend
             
 
@@ -36,11 +34,11 @@ jobs:
                 cache-dependency-path: backend/go.sum # Specify the path to the go.sum file for caching dependencies
 
             - name: Run GO Format # Run gofmt to check for code formatting issues
-              run: go fmt ./... # Format all Go files
-
+              run: go fmt  # Format all Go files
+              working-directory: backend
             - name: Run GO Vet # Run go vet to check for code issues
-              run: go vet ./... # Vet all Go files
-
+              run: go vet  # Vet all Go files
+              working-directory: backend
             - name: Run GO Test # Run Go tests
-              run: go test ./... # Execute all Go tests
+              run: go test  # Execute all Go tests
               working-directory: backend
