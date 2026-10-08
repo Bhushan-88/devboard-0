@@ -4,7 +4,8 @@
 name: CD-pipeline
 
 on:
-  workflow_dispatch: # Trigger the workflow on a repository_dispatch event
+  workflow_call: # Allows this workflow to be called by other workflows
+
 jobs:
    deploy:
     runs-on: self-hosted # Use a self-hosted runner for deployment
