@@ -3,7 +3,7 @@ name: DevSecOps
 
 on: 
   push:
-    branches: [feat/matrix-docker-build] # Trigger the workflow on changes to the advanced branch
+      branches: [feat/matrix-docker-build] # Trigger the workflow on changes to the advanced branch
 jobs:
     # Use the code-quality workflow defined in the .github/workflows/code-quality.yml file
     code-quality:
