@@ -8,16 +8,11 @@ on:
 jobs:
     sast:
         runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix: 
-          languages: ['node','go'] # Define node and go as the matrix values for the job
-
         steps:
             - name: Checkout code
               uses: actions/checkout@v7
             - name: Set up Node.js
-              uses: actions/setup-${{ matrix.languages }}@v6 # Set up Node.js environment
+              uses: actions/setup-node@v6 # Set up Node.js environment
               with:
                 node-version: '20' # Specify the Node.js version to use
                 cache: npm
@@ -34,7 +29,7 @@ jobs:
             
 
             - name: Set up Go # Set up Go environment
-              uses: actions/setup-${{ matrix.languages }}@v6 # Use the Go setup action
+              uses: actions/setup-go@v6 # Use the Go setup action
               with:
                 go-version: '1.23' # Specify the Go version to use
                 go-version-file: backend/go.mod # Specify the path to the go.mod file for version management
